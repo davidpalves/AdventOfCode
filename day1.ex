@@ -1,8 +1,7 @@
-# Run as: iex --dot-iex path/to/notebook.exs
-
 # Title: Day 1 - Advent of Code 2023
 
-Mix.install([:kino])
+# Kino can be used in case this is being run on a elixir's livebook
+# Mix.install([:kino])
 
 # ── Section ──
 
@@ -23,6 +22,8 @@ zoneight234
 7pqrstsixteen
 """
 
+
+# Kino can be used in case this is being run on a elixir's livebook
 input = Kino.Input.textarea("Please, insert your input here: ")
 
 defmodule DayOne do
@@ -44,19 +45,33 @@ defmodule DayOne do
     |> Enum.map(&String.to_charlist/1)
   end
 
+  @doc """
+  Filters characters that match digits between [0..9]
+  and transforms it to a list of integer
+  """
   def filter_integers(line) do
-    numbers = Enum.filter(line, fn char -> char in ?0..?9 end)
+    numbers = Enum.filter(line, fn char -> char in ?0..?9 end) # Filter characters that are digits
+
     first_number = hd(numbers)
+    last_number = List.last(numbers)
 
-    last_number =
-      numbers
-      |> Enum.reverse()
-      |> hd
-
-    [first_number, last_number]
-    |> List.to_integer()
+    [first_number, last_number] |> List.to_integer()
   end
 
+  @doc """
+  Transforms a number into a parseable digit
+  surrounded by the written nubmer to be processed
+  by the rest of the solution.
+
+  In order for the solution to work with
+  overlapping words, I decided to surround the parsed digit with the word,
+  so it would not affect prior or later possible parseable words
+
+  ## Example
+  iex> transform_words("eightwothree")
+  eight8eightwo2twothree3three
+
+  """
   def transform_words(input) do
     @numbers
     |> Enum.reduce(input, fn {word, number}, s ->
@@ -65,14 +80,17 @@ defmodule DayOne do
   end
 end
 
+
+# Part 1
 input
-|> Kino.Input.read()
+|> Kino.Input.read() # Kino can be used in case this is being run on a elixir's livebook
 |> DayOne.parse_input()
 |> Enum.map(&DayOne.filter_integers/1)
 |> Enum.sum()
 
+# Part 2
 input
-|> Kino.Input.read()
+|> Kino.Input.read() # Kino can be used in case this is being run on a elixir's livebook
 |> DayOne.transform_words()
 |> DayOne.parse_input()
 |> Enum.map(&DayOne.filter_integers/1)
