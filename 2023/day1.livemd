@@ -1,18 +1,13 @@
-# Title: Day 1 - Advent of Code 2023
+# Day 1 - Advent of Code 2023
 
-# Kino can be used in case this is being run on a elixir's livebook
-# Mix.install([:kino])
+```elixir
+Mix.install([:kino])
+```
 
-# ── Section ──
+## Input
 
-example_input_part_one = """
-1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet
-"""
-
-example_input_part_two = """
+```elixir
+example_input = """
 two1nine
 eightwothree
 abcone2threexyz
@@ -21,11 +16,16 @@ xtwone3four
 zoneight234
 7pqrstsixteen
 """
+```
 
+## Parsing
 
+```elixir
 # Kino can be used in case this is being run on a elixir's livebook
 input = Kino.Input.textarea("Please, insert your input here: ")
+```
 
+```elixir
 defmodule DayOne do
   @numbers %{
     one: 1,
@@ -50,12 +50,15 @@ defmodule DayOne do
   and transforms it to a list of integer
   """
   def filter_integers(line) do
-    numbers = Enum.filter(line, fn char -> char in ?0..?9 end) # Filter characters that are digits
-
+    numbers = Enum.filter(line, fn char -> char in ?0..?9 end)
     first_number = hd(numbers)
-    last_number = List.last(numbers)
 
-    [first_number, last_number] |> List.to_integer()
+    last_number =
+      numbers
+      |> List.last()
+
+    [first_number, last_number]
+    |> List.to_integer()
   end
 
   @doc """
@@ -68,8 +71,8 @@ defmodule DayOne do
   so it would not affect prior or later possible parseable words
 
   ## Example
-  iex> transform_words("eightwothree")
-  eight8eightwo2twothree3three
+  # iex> transform_words("eightwothree")
+  # "eight8eightwo2twothree3three"
 
   """
   def transform_words(input) do
@@ -79,19 +82,25 @@ defmodule DayOne do
     end)
   end
 end
+```
 
+## Part 1
 
-# Part 1
+```elixir
 input
-|> Kino.Input.read() # Kino can be used in case this is being run on a elixir's livebook
+|> Kino.Input.read()
 |> DayOne.parse_input()
 |> Enum.map(&DayOne.filter_integers/1)
 |> Enum.sum()
+```
 
-# Part 2
+## Part 2
+
+```elixir
 input
-|> Kino.Input.read() # Kino can be used in case this is being run on a elixir's livebook
+|> Kino.Input.read()
 |> DayOne.transform_words()
 |> DayOne.parse_input()
 |> Enum.map(&DayOne.filter_integers/1)
 |> Enum.sum()
+```

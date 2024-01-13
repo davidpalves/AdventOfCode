@@ -1,0 +1,62 @@
+# Day 2 - Advent of Code 2023
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.11.3"},
+  {:kino_aoc, "~> 0.1"}
+])
+```
+
+## Section
+
+<!-- livebook:{"attrs":{"assign_to":"puzzle_input","day":"2","session_secret":"AOC_SESSION","year":"2023"},"chunks":null,"kind":"Elixir.KinoAOC.HelperCell","livebook_object":"smart_cell"} -->
+
+```elixir
+{:ok, puzzle_input} =
+  KinoAOC.download_puzzle("2023", "2", System.fetch_env!("LB_AOC_SESSION"))
+```
+
+```elixir
+defmodule AoC.Day2 do
+  def part1(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.filter(
+      &match?(%{green: g, red: r, blue: b} when g <= 13 and r <= 12 and b <= 14, bag_max(&1))
+    )
+    |> Enum.map(fn s -> Regex.run(~r/Game (\d+)/, s) |> List.last() |> String.to_integer() end)
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.map(&bag_max/1)
+    |> Enum.map(fn c -> c[:green] * c[:red] * c[:blue] end)
+    |> Enum.sum()
+  end
+
+  def bag_max(line) do
+    Regex.scan(~r/(\d+) (blue|red|green)/, line)
+    |> Enum.map(&tl/1)
+    |> Enum.group_by(&String.to_atom(List.last(&1)), &String.to_integer(List.first(&1)))
+    |> Enum.into(%{}, fn {k, v} -> {k, Enum.max(v)} end)
+  end
+end
+```
+
+## Part 1
+
+```elixir
+puzzle_input
+|> AoC.Day2.part1()
+```
+
+## Part 2
+
+```elixir
+puzzle_input
+|> AoC.Day2.part2()
+```
+
+<!-- livebook:{"offset":1328,"stamp":{"token":"XCP.nsHMxHFjsnhuGNwp7tuBGPfa5cv6bz66LnMv5eLlstSfQdhIWtKtPxo1zT1bUcQSYfjok0r4NYTOWydU7TGYgtM5AJEbnXThBN1YYsRRhzk1DF6WAKc","version":2}} -->

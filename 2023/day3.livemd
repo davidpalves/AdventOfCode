@@ -1,0 +1,86 @@
+# AoC Day 3 - 2023
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.12.2"},
+  {:kino_aoc, "~> 0.1.6"}
+])
+```
+
+## Section
+
+<!-- livebook:{"attrs":{"assign_to":"puzzle_input","day":"3","session_secret":"AOC_SESSION","year":"2023"},"chunks":null,"kind":"Elixir.KinoAOC.HelperCell","livebook_object":"smart_cell"} -->
+
+```elixir
+{:ok, puzzle_input} =
+  KinoAOC.download_puzzle("2023", "3", System.fetch_env!("LB_AOC_SESSION"))
+```
+
+```elixir
+example_input =
+  """
+  467..114..
+  ...*......
+  ..35..633.
+  ......#...
+  617*......
+  .....+.58.
+  ..592.....
+  ......755.
+  ...$.*....
+  .664.598..
+  """
+```
+
+```elixir
+engine =
+  example_input
+  |> String.split("\n")
+  |> Enum.with_index()
+```
+
+```elixir
+numbers =
+  engine
+  |> Enum.flat_map(fn {line, y} ->
+    Regex.scan(~r/\d+/, line, return: :index)
+    |> List.flatten()
+    |> Enum.map(fn {x, length} ->
+      {(x - 1)..(x + length), (y - 1)..(y + 1),
+       String.slice(line, x, length) |> String.to_integer()}
+    end)
+  end)
+```
+
+```elixir
+symbols =
+  engine
+  |> Enum.flat_map(fn {line, y} ->
+    Regex.scan(~r/[^\d^\.]/, line, capure: :all_but_first, return: :index)
+    |> List.flatten()
+    |> Enum.map(fn {x, _} -> {x, y, String.slice(line, x, 1)} end)
+  end)
+```
+
+```elixir
+list_adjacent_numbers = fn x, y, numbers ->
+  numbers
+  |> Stream.filter(fn {cols, rows, _number} -> x in cols and y in rows end)
+  |> Enum.map(fn {_rows, _cols, number} -> number end)
+end
+
+symbols
+|> Stream.flat_map(fn {x, y, _symbol} -> list_adjacent_numbers.(x, y, numbers) end)
+|> Enum.sum()
+```
+
+```elixir
+symbols
+|> Stream.filter(fn {_x, _y, symbol} -> symbol == "*" end)
+|> Stream.map(fn {x, y, _symbol} -> list_adjacent_numbers.(x, y, numbers) end)
+|> Stream.filter(fn numbers -> Enum.count(numbers) >= 2 end)
+|> Stream.map(fn [a, b] -> a * b end)
+|> Enum.sum()
+```
+
+<!-- livebook:{"offset":1800,"stamp":{"token":"XCP.NYeUFdbHQlMZfeCR3FFv4FD1WbPF66fLcRZBbS5yLBQ2tE7STpjGeQmWuPxyiyIx38bbegasXc0CeVYTm-jZeB5bCtm_FS27PaOTBTDRfzrLJR9wM3c","version":2}} -->

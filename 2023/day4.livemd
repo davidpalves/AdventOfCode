@@ -1,0 +1,71 @@
+# AoC Day 4
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.12.2"},
+  {:kino_aoc, "~> 0.1.6"}
+])
+```
+
+## Section
+
+<!-- livebook:{"attrs":{"assign_to":"puzzle_input","day":"4","session_secret":"AOC_SESSION","year":"2023"},"chunks":null,"kind":"Elixir.KinoAOC.HelperCell","livebook_object":"smart_cell"} -->
+
+```elixir
+{:ok, puzzle_input} =
+  KinoAOC.download_puzzle("2023", "4", System.fetch_env!("LB_AOC_SESSION"))
+```
+
+```elixir
+example_input = """
+Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
+Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
+Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
+Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
+Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
+Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
+"""
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+split = fn input -> String.split(input, " ", trim: true) end
+
+match_counts =
+  puzzle_input
+  |> String.split("\n", trim: true)
+  |> Stream.map(fn line -> String.split(line, [": ", " | "]) end)
+  |> Stream.map(fn [_card, left, right] -> {split.(left), split.(right)} end)
+  |> Stream.map(fn {winners, numbers} -> winners -- winners -- numbers end)
+  |> Stream.map(fn matches -> Enum.count(matches) end)
+  |> Enum.with_index(1)
+```
+
+## Part 1
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+match_counts
+|> Stream.reject(fn {count, _} -> count <= 0 end)
+|> Stream.map(fn {count, _} -> Integer.pow(2, count - 1) end)
+|> Enum.sum()
+```
+
+## Part 2
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+for {count, i} <- match_counts,
+    count > 0,
+    j <- (i + 1)..(i + count),
+    reduce: Map.new(match_counts, fn {_, i} -> {i, 1} end) do
+  acc -> Map.put(acc, j, acc[j] + acc[i])
+end
+|> Map.values()
+|> Enum.sum()
+```
+
+<!-- livebook:{"offset":1753,"stamp":{"token":"XCP.q_sCTUF1dgKXxgJIlgDx3qSYAOMvYbev87s0mPmF6FSEPUGTdM7pW0xk492tXKkPTqDIDO_LVhyAfM6l5QMU4rsdkGQ09BSiq5R1UOpjSsUQbDSwaaw","version":2}} -->
